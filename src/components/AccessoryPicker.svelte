@@ -69,8 +69,8 @@
       <Tile
         title={category.name}
         image={categoryImages[category.id]
-          ? resolvePath(`/src/${categoryImages[category.id]}`)
-          : resolvePath(`/src/${category.image}`)}
+          ? resolvePath(`/${categoryImages[category.id]}`)
+          : resolvePath(`/${category.image}`)}
         selected={selectedAccessoryCategory === category.id}
         onActivate={() => onCategoryActivate(category.id)}
         role="tab"
@@ -94,7 +94,7 @@
         <Tile
           title="None"
           subtext="none"
-          image={resolvePath("/src/assets/NoSelected.svg")}
+          image={resolvePath("/assets/NoSelected.svg")}
           overlayCheck
           selected={!selections[category.id]?.id ||
             selections[category.id]?.id === "none"}
@@ -104,7 +104,7 @@
           <Tile
             title={accessory.name}
             subtext={accessory.id}
-            image={resolvePath(`/src/${accessory.image}`)}
+            image={resolvePath(`/${accessory.image}`)}
             overlayCheck
             selected={selections[category.id]?.id === accessory.id}
             onActivate={() => onAccessoryActivate(accessory.id)}

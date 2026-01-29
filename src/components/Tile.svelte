@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from "svelte/elements";
   import { resolvePath } from "../utilities/resolvePath";
 
-  const fallbackImage = resolvePath("/src/assets/AssetError.svg");
+  const fallbackImage = resolvePath("/assets/AssetError.svg");
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
