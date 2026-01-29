@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { HTMLAttributes } from "svelte/elements";
+  import { resolvePath } from "../utilities/resolvePath";
 
-  const fallbackImage = "./assets/AssetError.svg";
+  const fallbackImage = resolvePath("/src/assets/AssetError.svg");
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -24,7 +25,7 @@
   }: Props = $props();
 
   function onClick(event: MouseEvent) {
-    if ((event.target as HTMLElement).closest('.tile__color-picker-trigger')) {
+    if ((event.target as HTMLElement).closest(".tile__color-picker-trigger")) {
       return;
     }
     onActivate();
@@ -33,7 +34,9 @@
     if (event.key === " ") {
       event.preventDefault();
     } else if (event.key === "Enter") {
-      if ((event.target as HTMLElement).closest('.tile__color-picker-trigger')) {
+      if (
+        (event.target as HTMLElement).closest(".tile__color-picker-trigger")
+      ) {
         return;
       }
       event.preventDefault();
@@ -42,7 +45,9 @@
   }
   function keyUp(event: KeyboardEvent) {
     if (event.key === " ") {
-      if ((event.target as HTMLElement).closest('.tile__color-picker-trigger')) {
+      if (
+        (event.target as HTMLElement).closest(".tile__color-picker-trigger")
+      ) {
         return;
       }
       event.preventDefault();

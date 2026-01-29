@@ -3,6 +3,7 @@
   import ColorPicker from "./ColorPicker.svelte";
   import type { Category, Accessory } from "../schema/types";
   import type { Selection } from "../stores/selections.svelte";
+  import { resolvePath } from "../utilities/resolvePath";
 
   interface Props {
     accessoryCategories: Category[];
@@ -67,7 +68,9 @@
     {#each accessoryCategories as category}
       <Tile
         title={category.name}
-        image={categoryImages[category.id] ?? category.image}
+        image={categoryImages[category.id]
+          ? resolvePath(`/src/${categoryImages[category.id]}`)
+          : resolvePath(`/src/${category.image}`)}
         selected={selectedAccessoryCategory === category.id}
         onActivate={() => onCategoryActivate(category.id)}
         role="tab"
@@ -91,7 +94,7 @@
         <Tile
           title="None"
           subtext="none"
-          image="/assets/NoSelected.svg"
+          image={resolvePath("/src/assets/NoSelected.svg")}
           overlayCheck
           selected={!selections[category.id]?.id ||
             selections[category.id]?.id === "none"}
@@ -101,7 +104,7 @@
           <Tile
             title={accessory.name}
             subtext={accessory.id}
-            image={accessory.image}
+            image={resolvePath(`/src/${accessory.image}`)}
             overlayCheck
             selected={selections[category.id]?.id === accessory.id}
             onActivate={() => onAccessoryActivate(accessory.id)}
