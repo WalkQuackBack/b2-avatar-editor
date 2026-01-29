@@ -15,4 +15,5 @@ export default defineConfig({
 
   site: 'https://walkquackback.github.io',
   base: '/b2-avatar-editor',
+  trailingSlash: "never"
 });
