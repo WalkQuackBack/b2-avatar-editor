@@ -4,7 +4,7 @@ export const BodyAccessories: Accessory[] = [
   {
     name: "Default",
     id: "default",
-    image: "./assets/DefaultBody.png",
+    image: "",
     cost: 0,
     supportsPrimaryColor: true,
     supportsSecondaryColor: false,

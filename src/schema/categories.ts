@@ -4,12 +4,12 @@ export const Categories: Category[] = [
   {
     name: 'Body',
     id: 'body',
-    image: './assets/categories/BodyPlaceholder.svg'
+    image: 'assets/categories/BodyPlaceholder.svg'
   },
   {
     name: 'Hat',
     id: 'hat',
-    image: './assets/categories/HatPlaceholder.svg'
+    image: 'assets/categories/HatPlaceholder.svg'
   },
   {
     name: 'Accessory',
@@ -34,6 +34,6 @@ export const Categories: Category[] = [
   {
     name: 'Effect',
     id: 'effect',
-    image: './assets/categories/EffectsPlaceholder.svg'
+    image: 'assets/categories/EffectsPlaceholder.svg'
   },
 ];
