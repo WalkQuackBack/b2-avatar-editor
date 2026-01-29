@@ -11,5 +11,8 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()]
-  }
+  },
+
+  site: 'https://walkquackback.github.io',
+  base: '/b2-avatar-editor',
 });
