@@ -78,6 +78,8 @@
       }}
       alt=""
       role="presentation"
+      width="100"
+      height="100"
     />
     {#if overlayCheck}
       <div
@@ -102,9 +104,12 @@
       </div>
     {/if}
   </div>
-  <span class="tile__title text-md text-center">{title}</span>
+  <span
+    class="tile__title text-md text-center text-neutral-900 dark:text-neutral-100"
+    >{title}</span
+  >
   {#if subtext}
-    <span class="tile__subtext text-sm text-neutral-500 dark:text-neutral-400"
+    <span class="tile__subtext text-sm text-neutral-600 dark:text-neutral-400"
       >{subtext}</span
     >
   {/if}

@@ -63,7 +63,7 @@
 <div class="h-full flex flex-col shrink-0">
   <div
     role="tablist"
-    class="category-grid p-2 lg:p-4 rounded-t-3xl lg:rounded-none flex flex-nowrap shrink-0 overflow-x-auto [scrollbar-gutter:stable] bg-neutral-100 dark:bg-neutral-800"
+    class="category-grid p-2 lg:p-4 rounded-t-3xl lg:rounded-none flex flex-nowrap shrink-0 overflow-x-auto [scrollbar-gutter:stable] bg-neutral-200 dark:bg-neutral-800"
   >
     {#each accessoryCategories as category}
       <Tile
@@ -81,7 +81,7 @@
   </div>
 
   <div
-    class="grow overflow-y-auto [scrollbar-gutter:stable] bg-neutral-200 dark:bg-neutral-900"
+    class="grow overflow-y-auto [scrollbar-gutter:stable] bg-neutral-100 dark:bg-neutral-900"
   >
     {#each accessoryCategories as category}
       <div
@@ -111,7 +111,7 @@
           >
             {#if selections[category.id]?.id === accessory.id && (accessory.supportsPrimaryColor || accessory.supportsSecondaryColor || accessory.supportsTertiaryColor)}
               <button
-                class="tile__color-picker-trigger absolute left-1 top-1 p-2 shadow-sm rounded-md cursor-pointer
+                class="tile__color-picker-trigger absolute left-1 top-1 p-2 shadow-md rounded-md cursor-pointer
                   bg-white dark:bg-neutral-700 hover:bg-neutral-100 hover:dark:bg-neutral-600"
                 onclick={(e) => {
                   e.stopPropagation();
@@ -136,6 +136,8 @@
                     d="m8.5 4.5 2.148-2.148a1.205 1.205 0 0 1 1.704 0l7.296 7.296a1.205 1.205 0 0 1 0 1.704l-7.592 7.592a3.615 3.615 0 0 1-5.112 0l-3.888-3.888a3.615 3.615 0 0 1 0-5.112L5.67 7.33"
                   /></svg
                 >
+                <!-- Touch target -->
+                <div class="not-pointer-coarse:hidden absolute -inset-1"></div>
               </button>
             {/if}
           </Tile>
