@@ -15,13 +15,19 @@
       const selection = selections[category.id];
       const id = selection?.id || "none";
       
-      let part = `${category.id}:${id}`;
+      let part = `${category.id}`;
 
-      if (id !== "none") {
-        if (selection?.primaryColor) part += selection.primaryColor;
-        if (selection?.secondaryColor) part += selection.secondaryColor;
-        if (selection?.tertiaryColor) part += selection.tertiaryColor;
+      if (category.id === "body" && id === "default") {
+        part += ":";
+      } else if (id !== "none") {
+        part += `:${id}`;
+      } else {
+        part += `:${id}`;
       }
+
+      if (selection?.primaryColor) part += selection.primaryColor;
+      if (selection?.secondaryColor) part += selection.secondaryColor;
+      if (selection?.tertiaryColor) part += selection.tertiaryColor;
 
       parts.push(part);
     }
