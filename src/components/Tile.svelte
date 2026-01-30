@@ -9,6 +9,7 @@
     subtext?: string;
     image?: string;
     selected?: boolean;
+    size?: 'small' | 'medium'
     overlayCheck?: boolean;
     onActivate: () => void;
   }
@@ -18,6 +19,7 @@
     subtext,
     image = fallbackImage,
     selected = false,
+    size = "medium",
     overlayCheck = false,
     onActivate,
     children,
@@ -56,12 +58,14 @@
   }
 </script>
 
+<!-- svelte-ignore a11y_role_supports_aria_props -->
 <div
   onclick={onClick}
   onkeydown={keyDown}
   onkeyup={keyUp}
-  class="tile group flex flex-col shrink-0 items-center p-2 max-w-25 cursor-pointer rounded-2xl relative"
-  aria-pressed={selected}
+  class="tile group flex flex-col shrink-0 items-center cursor-pointer relative {size === "small" ? 'p-1 max-w-20 rounded-2xl' : 'p-2 max-w-25 rounded-2xl'}"
+  aria-pressed={rest.role !== "tab" ? selected : undefined}
+  aria-selected={rest.role === "tab" ? selected : undefined}
   role="button"
   tabindex="0"
   {...rest}
@@ -105,7 +109,7 @@
     {/if}
   </div>
   <span
-    class="tile__title text-md text-center text-neutral-900 dark:text-neutral-100"
+    class="tile__title {size === "small" ? 'text-xs' : 'text-md'} text-center text-neutral-900 dark:text-neutral-100"
     >{title}</span
   >
   {#if subtext}
