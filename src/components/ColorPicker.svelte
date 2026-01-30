@@ -232,6 +232,7 @@
     >
       <input
         type="color"
+        aria-label="Custom color picker"
         value={getSelectedColor(activeTab) || "#000000"}
         oninput={(e) => onColorSelect(activeTab, e.currentTarget.value)}
         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -243,11 +244,13 @@
     </div>
     <div class="relative flex-1">
       <span
+        aria-hidden="true"
         class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-sm"
         >#</span
-      >
+  >
       <input
         type="text"
+        aria-label="Hex color code"
         value={(getSelectedColor(activeTab) || "#000000").replace("#", "")}
         oninput={(e) => {
           const val = e.currentTarget.value.replace(/[^0-9A-Fa-f]/g, "");
