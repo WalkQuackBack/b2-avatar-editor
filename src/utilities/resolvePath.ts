@@ -1,3 +1,4 @@
 export function resolvePath(path: string) {
-  return `${import.meta.env.BASE_URL}${path}`
+  if (path === '') return `${import.meta.env.BASE_URL}/assets/AssetError.svg`
+  return `${import.meta.env.BASE_URL}/${path}`
 }

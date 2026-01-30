@@ -2,8 +2,6 @@
   import type { HTMLAttributes } from "svelte/elements";
   import { resolvePath } from "../utilities/resolvePath";
 
-  const fallbackImage = resolvePath("/assets/AssetError.svg");
-
   interface Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
     subtext?: string;
@@ -17,7 +15,7 @@
   let {
     title,
     subtext,
-    image = fallbackImage,
+    image,
     selected = false,
     size = "medium",
     overlayCheck = false,
@@ -77,9 +75,6 @@
   >
     <img
       src={image}
-      onerror={() => {
-        image = fallbackImage;
-      }}
       alt=""
       role="presentation"
       width="100"
