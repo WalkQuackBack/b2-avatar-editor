@@ -1,17 +1,15 @@
 <script lang="ts">
   import Tile from "./Tile.svelte";
   import ColorPicker from "./ColorPicker.svelte";
-  import type { Category, Accessory } from "../schema/types";
-  import type { Selection } from "../stores/selections.svelte";
+  import type { Category } from "../schema/types";
+  import { selections } from "../stores/selections.svelte";
+  import { accessoryData } from "../utilities/accessoryData";
   import { resolvePath } from "../utilities/resolvePath";
 
   interface Props {
     accessoryCategories: Category[];
-    categoryImages: Record<string, string | undefined>;
     selectedAccessoryCategory: string;
     onCategoryActivate: (category: string) => void;
-    selections: Record<string, Selection>;
-    accessoryData: Record<string, Accessory[]>;
     onAccessoryActivate: (id: string) => void;
     onColorChange: (
       category: string,
@@ -22,17 +20,27 @@
 
   let {
     accessoryCategories,
-    categoryImages,
     selectedAccessoryCategory,
     onCategoryActivate,
-    selections,
-    accessoryData,
     onAccessoryActivate,
     onColorChange,
   }: Props = $props();
 
   let showColorPickerId = $state<string | null>(null);
   let anchorElement = $state<HTMLElement | null>(null);
+
+  let focusedCategory = $state("");
+
+  let tablistEl = $state<HTMLElement | null>(null);
+  let showLeftMask = $state(false);
+  let showRightMask = $state(false);
+
+  function updateMasks() {
+    if (!tablistEl) return;
+    showLeftMask = tablistEl.scrollLeft > 4;
+    showRightMask =
+      tablistEl.scrollLeft < tablistEl.scrollWidth - tablistEl.clientWidth - 4;
+  }
 
   const activeAccessory = $derived.by(() => {
     if (!showColorPickerId) return null;
@@ -51,31 +59,82 @@
     }
   }
 
+  function handleTabKeyDown(event: KeyboardEvent) {
+    const currentIndex = accessoryCategories.findIndex(
+      (c) => c.id === focusedCategory,
+    );
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % accessoryCategories.length;
+    } else if (event.key === "ArrowLeft") {
+      nextIndex =
+        (currentIndex - 1 + accessoryCategories.length) %
+        accessoryCategories.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = accessoryCategories.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    const nextCategory = accessoryCategories[nextIndex].id;
+    focusedCategory = nextCategory;
+    onCategoryActivate(nextCategory);
+
+    // Focus the new tab
+    const nextTab = document.getElementById(nextCategory + "-tab");
+    nextTab?.focus();
+  }
+
   // Close color picker when category changes
   $effect(() => {
     // track changes to close picker
-    selectedAccessoryCategory;
     showColorPickerId = null;
     anchorElement = null;
+    focusedCategory = selectedAccessoryCategory;
+  });
+
+  $effect(() => {
+    if (tablistEl) {
+      updateMasks();
+      const resizeObserver = new ResizeObserver(updateMasks);
+      resizeObserver.observe(tablistEl);
+      return () => resizeObserver.disconnect();
+    }
   });
 </script>
 
 <div class="h-full flex flex-col shrink-0">
   <div
+    bind:this={tablistEl}
+    onscroll={updateMasks}
     role="tablist"
-    class="category-grid p-2 lg:p-4 rounded-t-3xl lg:rounded-none flex flex-nowrap shrink-0 overflow-x-auto [scrollbar-gutter:stable] bg-neutral-200 dark:bg-neutral-800"
+    aria-label="Accessory categories"
+    onkeydown={handleTabKeyDown}
+    tabindex="-1"
+    class="category-grid p-2 lg:p-4 rounded-t-3xl lg:rounded-none flex flex-nowrap shrink-0 overflow-x-auto bg-neutral-200 dark:bg-neutral-800 scrollbar-hide"
+    style:mask-image="linear-gradient(to right, {showLeftMask
+      ? 'rgb(0 0 0 / 0.2)'
+      : 'black'}, black 40px, black calc(100% - 40px), {showRightMask
+      ? 'rgb(0 0 0 / 0.2)'
+      : 'black'})"
   >
     {#each accessoryCategories as category}
       <Tile
         title={category.name}
-        image={categoryImages[category.id]
-          ? resolvePath(`/${categoryImages[category.id]}`)
+        image={selections.categoryImages[category.id]
+          ? resolvePath(`/${selections.categoryImages[category.id]}`)
           : resolvePath(`/${category.image}`)}
         selected={selectedAccessoryCategory === category.id}
         onActivate={() => onCategoryActivate(category.id)}
         role="tab"
         aria-controls={category.id + "-panel"}
         id={category.id + "-tab"}
+        size="small"
+        tabindex={focusedCategory === category.id ? 0 : -1}
       ></Tile>
     {/each}
   </div>
@@ -89,15 +148,15 @@
         role="tabpanel"
         aria-labelledby={category.id + "-tab"}
         hidden={selectedAccessoryCategory !== category.id}
-        class="accessory-grid p-2 lg:p-4 grid grid-cols-[repeat(auto-fill,6.25em)] justify-between"
+        class="accessory-grid p-1 lg:p-4 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(6.25rem,1fr))]"
       >
         <Tile
           title="None"
           subtext="none"
           image={resolvePath("/assets/NoSelected.svg")}
           overlayCheck
-          selected={!selections[category.id]?.id ||
-            selections[category.id]?.id === "none"}
+          selected={!selections.value[category.id]?.id ||
+            selections.value[category.id]?.id === "none"}
           onActivate={() => onAccessoryActivate("none")}
         ></Tile>
         {#each accessoryData[category.id] as accessory}
@@ -106,10 +165,10 @@
             subtext={accessory.id}
             image={resolvePath(`/${accessory.image}`)}
             overlayCheck
-            selected={selections[category.id]?.id === accessory.id}
+            selected={selections.value[category.id]?.id === accessory.id}
             onActivate={() => onAccessoryActivate(accessory.id)}
           >
-            {#if selections[category.id]?.id === accessory.id && (accessory.supportsPrimaryColor || accessory.supportsSecondaryColor || accessory.supportsTertiaryColor)}
+            {#if selections.value[category.id]?.id === accessory.id && (accessory.supportsPrimaryColor || accessory.supportsSecondaryColor || accessory.supportsTertiaryColor)}
               <button
                 class="tile__color-picker-trigger absolute left-1 top-1 p-2 shadow-md rounded-md cursor-pointer
                   bg-white dark:bg-neutral-700 hover:bg-neutral-100 hover:dark:bg-neutral-600"
@@ -118,6 +177,7 @@
                   toggleColorPicker(accessory.id, e.currentTarget);
                 }}
                 title="Change Colors"
+                aria-label="Change Colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -151,9 +211,9 @@
       supportsPrimary={activeAccessory.supportsPrimaryColor}
       supportsSecondary={activeAccessory.supportsSecondaryColor}
       supportsTertiary={activeAccessory.supportsTertiaryColor}
-      selectedPrimary={selections[selectedAccessoryCategory]?.primaryColor}
-      selectedSecondary={selections[selectedAccessoryCategory]?.secondaryColor}
-      selectedTertiary={selections[selectedAccessoryCategory]?.tertiaryColor}
+      selectedPrimary={selections.value[selectedAccessoryCategory]?.primaryColor}
+      selectedSecondary={selections.value[selectedAccessoryCategory]?.secondaryColor}
+      selectedTertiary={selections.value[selectedAccessoryCategory]?.tertiaryColor}
       onColorSelect={(type, color) =>
         onColorChange(selectedAccessoryCategory, type, color)}
       onClose={() => (showColorPickerId = null)}
@@ -161,3 +221,13 @@
     />
   {/if}
 </div>
+
+<style>
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
