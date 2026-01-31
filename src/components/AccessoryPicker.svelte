@@ -50,7 +50,9 @@
   const activeSelection = $derived.by(() => {
     const selectedId = selections.value[selectedAccessoryCategory]?.id;
     if (!selectedId || selectedId === "none") return null;
-    return accessoryData[selectedAccessoryCategory].find((a) => a.id === selectedId);
+    return accessoryData[selectedAccessoryCategory].find(
+      (a) => a.id === selectedId,
+    );
   });
 
   const activeAccessory = $derived.by(() => {
@@ -102,12 +104,16 @@
 
   function handleGridKeyDown(event: KeyboardEvent, categoryId: string) {
     const accessories = [{ id: "none" }, ...accessoryData[categoryId]];
-    const currentIndex = accessories.findIndex((a) => a.id === focusedAccessoryId);
+    const currentIndex = accessories.findIndex(
+      (a) => a.id === focusedAccessoryId,
+    );
     let nextIndex = currentIndex;
 
     const gridEl = event.currentTarget as HTMLElement;
     const style = window.getComputedStyle(gridEl);
-    const gridCols = style.getPropertyValue("grid-template-columns").split(" ").length;
+    const gridCols = style
+      .getPropertyValue("grid-template-columns")
+      .split(" ").length;
 
     switch (event.key) {
       case "ArrowRight":
@@ -137,22 +143,27 @@
     focusedAccessoryId = nextAccessory.id;
 
     // Focus the new tile
-    const nextTile = document.getElementById(`${categoryId}-tile-${nextAccessory.id}`);
+    const nextTile = document.getElementById(
+      `${categoryId}-tile-${nextAccessory.id}`,
+    );
     nextTile?.focus();
   }
 
   // Close customization picker when category changes
   $effect(() => {
     // track changes to close picker ONLY when category id changes
-    selectedAccessoryCategory; 
+    selectedAccessoryCategory;
     untrack(() => {
       showCustomizationId = null;
       anchorElement = null;
       focusedCategory = selectedAccessoryCategory;
-      
+
       // Reset focused accessory for the new category
       const currentSelection = selections.value[selectedAccessoryCategory]?.id;
-      focusedAccessoryId = currentSelection && currentSelection !== "none" ? currentSelection : "none";
+      focusedAccessoryId =
+        currentSelection && currentSelection !== "none"
+          ? currentSelection
+          : "none";
     });
   });
 
@@ -221,7 +232,7 @@
           selected={!selections.value[category.id]?.id ||
             selections.value[category.id]?.id === "none"}
           onActivate={() => onAccessoryActivate("none")}
-          onfocus={() => focusedAccessoryId = "none"}
+          onfocus={() => (focusedAccessoryId = "none")}
           tabindex={focusedAccessoryId === "none" ? 0 : -1}
         ></Tile>
         {#each accessoryData[category.id] as accessory}
@@ -233,7 +244,7 @@
             overlayCheck
             selected={selections.value[category.id]?.id === accessory.id}
             onActivate={() => onAccessoryActivate(accessory.id)}
-            onfocus={() => focusedAccessoryId = accessory.id}
+            onfocus={() => (focusedAccessoryId = accessory.id)}
             tabindex={focusedAccessoryId === accessory.id ? 0 : -1}
           >
             {#if selections.value[category.id]?.id === accessory.id && (accessory.supportsPrimaryColor || accessory.supportsSecondaryColor || accessory.supportsTertiaryColor || (accessory.variants && accessory.variants.length > 0))}
@@ -258,7 +269,9 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="lucide lucide-settings-icon lucide-settings"
-                  ><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg
+                  ><path
+                    d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"
+                  /><circle cx="12" cy="12" r="3" /></svg
                 >
                 <!-- Touch target -->
                 <div class="not-pointer-coarse:hidden absolute -inset-1"></div>
@@ -273,10 +286,14 @@
   {#if activeAccessory && anchorElement}
     <CustomizationPicker
       accessory={activeAccessory}
-      selectedPrimary={selections.value[selectedAccessoryCategory]?.primaryColor}
-      selectedSecondary={selections.value[selectedAccessoryCategory]?.secondaryColor}
-      selectedTertiary={selections.value[selectedAccessoryCategory]?.tertiaryColor}
-      selectedVariantSuffix={selections.value[selectedAccessoryCategory]?.variantIdSuffix}
+      selectedPrimary={selections.value[selectedAccessoryCategory]
+        ?.primaryColor}
+      selectedSecondary={selections.value[selectedAccessoryCategory]
+        ?.secondaryColor}
+      selectedTertiary={selections.value[selectedAccessoryCategory]
+        ?.tertiaryColor}
+      selectedVariantSuffix={selections.value[selectedAccessoryCategory]
+        ?.variantIdSuffix}
       onColorSelect={(type, color) =>
         onColorChange(selectedAccessoryCategory, type, color)}
       onVariantSelect={(suffix) =>
@@ -286,6 +303,7 @@
     />
   {/if}
 </div>
+
 <style>
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
