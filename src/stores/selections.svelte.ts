@@ -21,7 +21,9 @@ class SelectionsStore {
       let part = `${category.id}`;
 
       if (category.id === "body" && id === "default") {
-        part += ":";
+        if (selection?.primaryColor || selection?.secondaryColor || selection?.tertiaryColor) {
+          part += ":";
+        }
       } else if (id !== "none") {
         part += `:${id}`;
       } else {
