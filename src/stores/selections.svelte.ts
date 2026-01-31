@@ -13,20 +13,15 @@ class SelectionsStore {
   value = $state<Record<string, Selection>>({});
 
   commandString = $derived.by(() => {
-    const parts: string[] = [];
-
-    for (const category of Categories) {
+    const parts = Categories.map((category) => {
       const selection = this.value[category.id];
       const id = selection?.id || "none";
-      
-      let part = `${category.id}`;
+      const hasModifiers = selection?.primaryColor || selection?.secondaryColor || selection?.tertiaryColor || selection?.variantIdSuffix;
+
+      let part = category.id;
 
       if (category.id === "body" && id === "default") {
-        if (selection?.primaryColor || selection?.secondaryColor || selection?.tertiaryColor || selection?.variantIdSuffix) {
-          part += ":";
-        }
-      } else if (id !== "none") {
-        part += `:${id}`;
+        if (hasModifiers) part += ":";
       } else {
         part += `:${id}`;
       }
@@ -36,8 +31,8 @@ class SelectionsStore {
       if (selection?.secondaryColor) part += selection.secondaryColor;
       if (selection?.tertiaryColor) part += selection.tertiaryColor;
 
-      parts.push(part);
-    }
+      return part;
+    });
 
     return parts.length > 0 ? `/fish ${parts.join(",")}` : "";
   });
@@ -45,13 +40,11 @@ class SelectionsStore {
   categoryImages = $derived.by(() => {
     const images: Record<string, string | undefined> = {};
     for (const category of Categories) {
-      const selected = this.value[category.id];
-      const selectedId = selected?.id;
+      const selectedId = this.value[category.id]?.id;
       if (selectedId && selectedId !== "none") {
-        const accessory = accessoryData[category.id]?.find(
+        images[category.id] = accessoryData[category.id]?.find(
           (a) => a.id === selectedId,
-        );
-        images[category.id] = accessory?.image;
+        )?.image;
       }
     }
     return images;

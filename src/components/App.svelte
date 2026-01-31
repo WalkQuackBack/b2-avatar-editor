@@ -1,7 +1,7 @@
 <script lang="ts">
   import AccessoryPicker from "./AccessoryPicker.svelte";
   import { Categories } from "../schema/categories";
-  import { selections } from "../stores/selections.svelte";
+  import { selections, type Selection } from "../stores/selections.svelte";
   import { accessoryData } from "../utilities/accessoryData";
   import { Palette } from "../schema/colors";
   import OutputBox from "./OutputBox.svelte";
@@ -17,7 +17,7 @@
 
   function onAccessoryActivate(id: string) {
     const current = selections.value[selectedAccessoryCategory];
-    const update: any = { id };
+    const update: Partial<Selection> = { id };
 
     if (id !== "none" && current?.id !== id) {
       const data = accessoryData[selectedAccessoryCategory].find(
