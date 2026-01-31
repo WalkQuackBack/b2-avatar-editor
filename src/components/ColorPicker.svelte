@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Palette } from "../schema/colors";
+  import { getNextIndex } from "../utilities/keyboardNavigation";
 
   interface Props {
     supportsPrimary: boolean;
@@ -57,32 +58,14 @@
   let focusedIndex = $state(0);
 
   function handlePaletteKeyDown(event: KeyboardEvent, index: number) {
-    const cols = 5;
-    let nextIndex = -1;
+    const nextIndex = getNextIndex(event.key, {
+      currentIndex: index,
+      totalItems: Palette.length,
+      columns: 5,
+      direction: "both",
+    });
 
-    switch (event.key) {
-      case "ArrowRight":
-        nextIndex = index + 1;
-        break;
-      case "ArrowLeft":
-        nextIndex = index - 1;
-        
-        break;
-      case "ArrowDown":
-        nextIndex = index + cols;
-        break;
-      case "ArrowUp":
-        nextIndex = index - cols;
-        break;
-      case "Home":
-        nextIndex = 0;
-        break;
-      case "End":
-        nextIndex = Palette.length - 1;
-        break;
-    }
-
-    if (nextIndex >= 0 && nextIndex < Palette.length) {
+    if (nextIndex !== index || ["Home", "End"].includes(event.key)) {
       event.preventDefault();
       const buttons =
         containerElement?.querySelectorAll<HTMLButtonElement>(".palette-button");
@@ -93,25 +76,15 @@
   function handleTabKeyDown(event: KeyboardEvent) {
     const supportedTabs = tabs.filter((t) => t.supported);
     const currentIndex = supportedTabs.findIndex((t) => t.id === activeTab);
-    let nextIndex = -1;
+    
+    const nextIndex = getNextIndex(event.key, {
+      currentIndex,
+      totalItems: supportedTabs.length,
+      direction: "horizontal",
+      loop: true,
+    });
 
-    switch (event.key) {
-      case "ArrowRight":
-        nextIndex = (currentIndex + 1) % supportedTabs.length;
-        break;
-      case "ArrowLeft":
-        nextIndex =
-          (currentIndex - 1 + supportedTabs.length) % supportedTabs.length;
-        break;
-      case "Home":
-        nextIndex = 0;
-        break;
-      case "End":
-        nextIndex = supportedTabs.length - 1;
-        break;
-    }
-
-    if (nextIndex !== -1) {
+    if (nextIndex !== currentIndex || ["Home", "End"].includes(event.key)) {
       event.preventDefault();
       const nextTabId = supportedTabs[nextIndex].id;
       activeTab = nextTabId;

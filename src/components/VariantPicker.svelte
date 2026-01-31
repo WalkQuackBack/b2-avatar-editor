@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { AccessoryVariant } from "../schema/types";
+  import { getNextIndex } from "../utilities/keyboardNavigation";
 
   interface Props {
     variants: AccessoryVariant[];
@@ -18,26 +19,13 @@
   let focusedIndex = $state(0);
 
   function handleKeyDown(event: KeyboardEvent, index: number) {
-    let nextIndex = -1;
+    const nextIndex = getNextIndex(event.key, {
+      currentIndex: index,
+      totalItems: variants.length,
+      direction: "vertical",
+    });
 
-    switch (event.key) {
-      case "ArrowRight":
-      case "ArrowDown":
-        nextIndex = index + 1;
-        break;
-      case "ArrowLeft":
-      case "ArrowUp":
-        nextIndex = index - 1;
-        break;
-      case "Home":
-        nextIndex = 0;
-        break;
-      case "End":
-        nextIndex = variants.length - 1;
-        break;
-    }
-
-    if (nextIndex >= 0 && nextIndex < variants.length) {
+    if (nextIndex !== index || ["Home", "End"].includes(event.key)) {
       event.preventDefault();
       const buttons =
         containerElement?.querySelectorAll<HTMLButtonElement>(".variant-button");

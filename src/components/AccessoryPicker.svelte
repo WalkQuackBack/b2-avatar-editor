@@ -3,11 +3,11 @@
   import Tile from "./Tile.svelte";
   import CustomizationPicker from "./CustomizationPicker.svelte";
   import type { Category } from "../schema/types";
-  import { selections } from "../stores/selections.svelte";
-  import { accessoryData } from "../utilities/accessoryData";
-  import { resolvePath } from "../utilities/resolvePath";
-
-  interface Props {
+    import { selections } from "../stores/selections.svelte";
+    import { accessoryData } from "../utilities/accessoryData";
+    import { getNextIndex } from "../utilities/keyboardNavigation";
+  
+    interface Props {
     accessoryCategories: Category[];
     selectedAccessoryCategory: string;
     onCategoryActivate: (category: string) => void;
@@ -76,21 +76,14 @@
     const currentIndex = accessoryCategories.findIndex(
       (c) => c.id === focusedCategory,
     );
-    let nextIndex = currentIndex;
+    const nextIndex = getNextIndex(event.key, {
+      currentIndex,
+      totalItems: accessoryCategories.length,
+      direction: "horizontal",
+      loop: true,
+    });
 
-    if (event.key === "ArrowRight") {
-      nextIndex = (currentIndex + 1) % accessoryCategories.length;
-    } else if (event.key === "ArrowLeft") {
-      nextIndex =
-        (currentIndex - 1 + accessoryCategories.length) %
-        accessoryCategories.length;
-    } else if (event.key === "Home") {
-      nextIndex = 0;
-    } else if (event.key === "End") {
-      nextIndex = accessoryCategories.length - 1;
-    } else {
-      return;
-    }
+    if (nextIndex === currentIndex && !["Home", "End"].includes(event.key)) return;
 
     event.preventDefault();
     const nextCategory = accessoryCategories[nextIndex].id;
@@ -107,7 +100,6 @@
     const currentIndex = accessories.findIndex(
       (a) => a.id === focusedAccessoryId,
     );
-    let nextIndex = currentIndex;
 
     const gridEl = event.currentTarget as HTMLElement;
     const style = window.getComputedStyle(gridEl);
@@ -115,28 +107,14 @@
       .getPropertyValue("grid-template-columns")
       .split(" ").length;
 
-    switch (event.key) {
-      case "ArrowRight":
-        nextIndex = Math.min(currentIndex + 1, accessories.length - 1);
-        break;
-      case "ArrowLeft":
-        nextIndex = Math.max(currentIndex - 1, 0);
-        break;
-      case "ArrowDown":
-        nextIndex = Math.min(currentIndex + gridCols, accessories.length - 1);
-        break;
-      case "ArrowUp":
-        nextIndex = Math.max(currentIndex - gridCols, 0);
-        break;
-      case "Home":
-        nextIndex = 0;
-        break;
-      case "End":
-        nextIndex = accessories.length - 1;
-        break;
-      default:
-        return;
-    }
+    const nextIndex = getNextIndex(event.key, {
+      currentIndex,
+      totalItems: accessories.length,
+      columns: gridCols,
+      direction: "both",
+    });
+
+    if (nextIndex === currentIndex && !["Home", "End"].includes(event.key)) return;
 
     event.preventDefault();
     const nextAccessory = accessories[nextIndex];
@@ -195,9 +173,7 @@
     {#each accessoryCategories as category}
       <Tile
         title={category.name}
-        image={selections.categoryImages[category.id]
-          ? resolvePath(`${selections.categoryImages[category.id]}`)
-          : resolvePath(`${category.image}`)}
+        image={selections.categoryImages[category.id] || category.image}
         selected={selectedAccessoryCategory === category.id}
         onActivate={() => onCategoryActivate(category.id)}
         role="tab"
@@ -227,7 +203,7 @@
           id="{category.id}-tile-none"
           title="None"
           subtext="none"
-          image={resolvePath("assets/NoSelected.svg")}
+          image="assets/NoSelected.svg"
           overlayCheck
           selected={!selections.value[category.id]?.id ||
             selections.value[category.id]?.id === "none"}
@@ -240,7 +216,7 @@
             id="{category.id}-tile-{accessory.id}"
             title={accessory.name}
             subtext={accessory.id}
-            image={resolvePath(`${accessory.image}`)}
+            image={accessory.image}
             overlayCheck
             selected={selections.value[category.id]?.id === accessory.id}
             onActivate={() => onAccessoryActivate(accessory.id)}
