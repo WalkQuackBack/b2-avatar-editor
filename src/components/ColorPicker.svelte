@@ -145,7 +145,7 @@
   {/each}
 </div>
 
-<div class="grid grid-cols-5 gap-2 mb-4">
+<div class="grid grid-cols-5 gap-2 mb-2">
   {#each Palette as color, i}
     <button
       onclick={() => onColorSelect(activeTab, color.hex)}
@@ -166,7 +166,7 @@
   {/each}
 </div>
 
-<div class="flex gap-2 mb-4">
+<div class="flex gap-2 mb-2">
   <div
     class="relative w-10 h-10 shrink-0 rounded-full focus-within:outline-2 outline-offset-2"
   >
