@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import Tile from "./Tile.svelte";
   import ColorPicker from "./ColorPicker.svelte";
   import type { Category } from "../schema/types";
@@ -30,8 +31,10 @@
   let anchorElement = $state<HTMLElement | null>(null);
 
   let focusedCategory = $state("");
+  let focusedAccessoryId = $state<string>("none");
 
   let tablistEl = $state<HTMLElement | null>(null);
+  let gridContainerEl = $state<HTMLElement | null>(null);
   let showLeftMask = $state(false);
   let showRightMask = $state(false);
 
@@ -41,6 +44,12 @@
     showRightMask =
       tablistEl.scrollLeft < tablistEl.scrollWidth - tablistEl.clientWidth - 4;
   }
+
+  const activeSelection = $derived.by(() => {
+    const selectedId = selections.value[selectedAccessoryCategory]?.id;
+    if (!selectedId || selectedId === "none") return null;
+    return accessoryData[selectedAccessoryCategory].find((a) => a.id === selectedId);
+  });
 
   const activeAccessory = $derived.by(() => {
     if (!showColorPickerId) return null;
@@ -89,12 +98,60 @@
     nextTab?.focus();
   }
 
+  function handleGridKeyDown(event: KeyboardEvent, categoryId: string) {
+    const accessories = [{ id: "none" }, ...accessoryData[categoryId]];
+    const currentIndex = accessories.findIndex((a) => a.id === focusedAccessoryId);
+    let nextIndex = currentIndex;
+
+    const gridEl = event.currentTarget as HTMLElement;
+    const style = window.getComputedStyle(gridEl);
+    const gridCols = style.getPropertyValue("grid-template-columns").split(" ").length;
+
+    switch (event.key) {
+      case "ArrowRight":
+        nextIndex = Math.min(currentIndex + 1, accessories.length - 1);
+        break;
+      case "ArrowLeft":
+        nextIndex = Math.max(currentIndex - 1, 0);
+        break;
+      case "ArrowDown":
+        nextIndex = Math.min(currentIndex + gridCols, accessories.length - 1);
+        break;
+      case "ArrowUp":
+        nextIndex = Math.max(currentIndex - gridCols, 0);
+        break;
+      case "Home":
+        nextIndex = 0;
+        break;
+      case "End":
+        nextIndex = accessories.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    const nextAccessory = accessories[nextIndex];
+    focusedAccessoryId = nextAccessory.id;
+
+    // Focus the new tile
+    const nextTile = document.getElementById(`${categoryId}-tile-${nextAccessory.id}`);
+    nextTile?.focus();
+  }
+
   // Close color picker when category changes
   $effect(() => {
-    // track changes to close picker
-    showColorPickerId = null;
-    anchorElement = null;
-    focusedCategory = selectedAccessoryCategory;
+    // track changes to close picker ONLY when category id changes
+    selectedAccessoryCategory; 
+    untrack(() => {
+      showColorPickerId = null;
+      anchorElement = null;
+      focusedCategory = selectedAccessoryCategory;
+      
+      // Reset focused accessory for the new category
+      const currentSelection = selections.value[selectedAccessoryCategory]?.id;
+      focusedAccessoryId = currentSelection && currentSelection !== "none" ? currentSelection : "none";
+    });
   });
 
   $effect(() => {
@@ -140,6 +197,7 @@
   </div>
 
   <div
+    bind:this={gridContainerEl}
     class="grow overflow-y-auto [scrollbar-gutter:stable] bg-neutral-100 dark:bg-neutral-900"
   >
     {#each accessoryCategories as category}
@@ -148,9 +206,12 @@
         role="tabpanel"
         aria-labelledby={category.id + "-tab"}
         hidden={selectedAccessoryCategory !== category.id}
+        onkeydown={(e) => handleGridKeyDown(e, category.id)}
         class="accessory-grid p-1 lg:p-4 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(6.25rem,1fr))]"
+        tabindex="-1"
       >
         <Tile
+          id="{category.id}-tile-none"
           title="None"
           subtext="none"
           image={resolvePath("assets/NoSelected.svg")}
@@ -158,9 +219,12 @@
           selected={!selections.value[category.id]?.id ||
             selections.value[category.id]?.id === "none"}
           onActivate={() => onAccessoryActivate("none")}
+          onfocus={() => focusedAccessoryId = "none"}
+          tabindex={focusedAccessoryId === "none" ? 0 : -1}
         ></Tile>
         {#each accessoryData[category.id] as accessory}
           <Tile
+            id="{category.id}-tile-{accessory.id}"
             title={accessory.name}
             subtext={accessory.id}
             image={resolvePath(`${accessory.image}`)}
@@ -221,7 +285,6 @@
     />
   {/if}
 </div>
-
 <style>
   .scrollbar-hide::-webkit-scrollbar {
     display: none;

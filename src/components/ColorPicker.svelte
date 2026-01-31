@@ -175,11 +175,7 @@
     e.preventDefault();
     onClose();
   }}
-  onclick={(e) => {
-    if (e.target === floatingElement) {
-      onClose();
-    }
-  }}
+  closedby="any"
   class="fixed z-50 w-60 pointer-coarse:w-72 bg-white dark:bg-neutral-800 rounded-4xl shadow-2xl p-4 border-none m-0 overflow-visible backdrop:bg-transparent"
   onkeydown={(e) => e.stopPropagation()}
   aria-label="Color Picker"
@@ -267,7 +263,7 @@
   <div class="flex gap-2">
     <button
       onclick={() => onColorSelect(activeTab, "")}
-      class="w-full h-10 pointer-coarse:h-12 rounded-full text-sm outline-offset-2
+      class="w-full h-10 pointer-coarse:h-12 cursor-pointer rounded-full text-sm outline-offset-2
       flex gap-1 pointer-coarse:gap-2 items-center justify-center
       border border-neutral-500 hover:bg-neutral-200 hover:dark:bg-neutral-700
       {getSelectedColor(activeTab) === ''
@@ -296,7 +292,7 @@
 
     <button
       onclick={onClose}
-      class="w-full h-10 pointer-coarse:h-12 rounded-full font-semibold text-sm outline-offset-2
+      class="w-full h-10 pointer-coarse:h-12 cursor-pointer rounded-full font-semibold text-sm outline-offset-2
       bg-black dark:bg-white text-white dark:text-black
       hover:bg-neutral-800 hover:dark:bg-neutral-200"
     >

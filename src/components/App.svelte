@@ -2,6 +2,8 @@
   import AccessoryPicker from "./AccessoryPicker.svelte";
   import { Categories } from "../schema/categories";
   import { selections } from "../stores/selections.svelte";
+  import { accessoryData } from "../utilities/accessoryData";
+  import { Palette } from "../schema/colors";
   import OutputBox from "./OutputBox.svelte";
   import type { Category } from "../schema/types";
 
@@ -14,7 +16,27 @@
   }
 
   function onAccessoryActivate(id: string) {
-    selections.update(selectedAccessoryCategory, { id });
+    const current = selections.value[selectedAccessoryCategory];
+    const update: any = { id };
+
+    if (id !== "none" && current?.id !== id) {
+      const data = accessoryData[selectedAccessoryCategory].find(
+        (a) => a.id === id,
+      );
+      if (data) {
+        if (data.supportsPrimaryColor && !current?.primaryColor) {
+          update.primaryColor = Palette[0].hex; // 1st
+        }
+        if (data.supportsSecondaryColor && !current?.secondaryColor) {
+          update.secondaryColor = Palette[6].hex; // 7th
+        }
+        if (data.supportsTertiaryColor && !current?.tertiaryColor) {
+          update.tertiaryColor = Palette[10].hex; // 11th
+        }
+      }
+    }
+
+    selections.update(selectedAccessoryCategory, update);
   }
 
   function onColorChange(
