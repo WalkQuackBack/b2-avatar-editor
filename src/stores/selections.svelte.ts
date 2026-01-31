@@ -3,6 +3,7 @@ import { accessoryData } from "../utilities/accessoryData";
 
 export interface Selection {
   id: string | null;
+  variantIdSuffix?: string;
   primaryColor?: string;
   secondaryColor?: string;
   tertiaryColor?: string;
@@ -21,7 +22,7 @@ class SelectionsStore {
       let part = `${category.id}`;
 
       if (category.id === "body" && id === "default") {
-        if (selection?.primaryColor || selection?.secondaryColor || selection?.tertiaryColor) {
+        if (selection?.primaryColor || selection?.secondaryColor || selection?.tertiaryColor || selection?.variantIdSuffix) {
           part += ":";
         }
       } else if (id !== "none") {
@@ -30,6 +31,7 @@ class SelectionsStore {
         part += `:${id}`;
       }
 
+      if (selection?.variantIdSuffix) part += selection.variantIdSuffix;
       if (selection?.primaryColor) part += selection.primaryColor;
       if (selection?.secondaryColor) part += selection.secondaryColor;
       if (selection?.tertiaryColor) part += selection.tertiaryColor;

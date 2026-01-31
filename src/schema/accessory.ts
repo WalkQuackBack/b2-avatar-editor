@@ -87,8 +87,13 @@ export const GeneralAccessories: Accessory[] = [
     id: "custom_cube",
     image: "",
     cost: 0,
-    supportsPrimaryColor: true,
-    supportsSecondaryColor: true,
-    supportsTertiaryColor: true
+    supportsPrimaryColor: false,
+    supportsSecondaryColor: false,
+    supportsTertiaryColor: false,
+    variants: [
+      { name: "Texture 1", idSuffix: "#tex1" },
+      { name: "Texture 2", idSuffix: "#tex2" },
+      { name: "Texture 3", idSuffix: "#tex3" }
+    ]
   }
 ];

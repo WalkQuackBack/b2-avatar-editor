@@ -46,6 +46,10 @@
   ) {
     selections.update(category, { [`${type}Color`]: color });
   }
+
+  function onVariantChange(category: CategoryId, suffix: string) {
+    selections.update(category, { variantIdSuffix: suffix });
+  }
 </script>
 
 <aside class="h-1/2 lg:max-w-1/2 lg:h-full flex flex-col shrink-0">
@@ -55,6 +59,7 @@
     {onCategoryActivate}
     {onAccessoryActivate}
     {onColorChange}
+    {onVariantChange}
   />
 </aside>
 
