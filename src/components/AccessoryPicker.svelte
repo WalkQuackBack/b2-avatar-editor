@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from "svelte";
   import Tile from "./Tile.svelte";
-  import ColorPicker from "./ColorPicker.svelte";
+  import CustomizationPicker from "./CustomizationPicker.svelte";
   import type { Category } from "../schema/types";
   import { selections } from "../stores/selections.svelte";
   import { accessoryData } from "../utilities/accessoryData";
@@ -17,6 +17,7 @@
       type: "primary" | "secondary" | "tertiary",
       color: string,
     ) => void;
+    onVariantChange: (category: string, suffix: string) => void;
   }
 
   let {
@@ -25,9 +26,10 @@
     onCategoryActivate,
     onAccessoryActivate,
     onColorChange,
+    onVariantChange,
   }: Props = $props();
 
-  let showColorPickerId = $state<string | null>(null);
+  let showCustomizationId = $state<string | null>(null);
   let anchorElement = $state<HTMLElement | null>(null);
 
   let focusedCategory = $state("");
@@ -52,18 +54,18 @@
   });
 
   const activeAccessory = $derived.by(() => {
-    if (!showColorPickerId) return null;
+    if (!showCustomizationId) return null;
     return accessoryData[selectedAccessoryCategory].find(
-      (a) => a.id === showColorPickerId,
+      (a) => a.id === showCustomizationId,
     );
   });
 
-  function toggleColorPicker(id: string, element: HTMLElement) {
-    if (showColorPickerId === id) {
-      showColorPickerId = null;
+  function toggleCustomization(id: string, element: HTMLElement) {
+    if (showCustomizationId === id) {
+      showCustomizationId = null;
       anchorElement = null;
     } else {
-      showColorPickerId = id;
+      showCustomizationId = id;
       anchorElement = element;
     }
   }
@@ -139,12 +141,12 @@
     nextTile?.focus();
   }
 
-  // Close color picker when category changes
+  // Close customization picker when category changes
   $effect(() => {
     // track changes to close picker ONLY when category id changes
     selectedAccessoryCategory; 
     untrack(() => {
-      showColorPickerId = null;
+      showCustomizationId = null;
       anchorElement = null;
       focusedCategory = selectedAccessoryCategory;
       
@@ -231,17 +233,19 @@
             overlayCheck
             selected={selections.value[category.id]?.id === accessory.id}
             onActivate={() => onAccessoryActivate(accessory.id)}
+            onfocus={() => focusedAccessoryId = accessory.id}
+            tabindex={focusedAccessoryId === accessory.id ? 0 : -1}
           >
-            {#if selections.value[category.id]?.id === accessory.id && (accessory.supportsPrimaryColor || accessory.supportsSecondaryColor || accessory.supportsTertiaryColor)}
+            {#if selections.value[category.id]?.id === accessory.id && (accessory.supportsPrimaryColor || accessory.supportsSecondaryColor || accessory.supportsTertiaryColor || (accessory.variants && accessory.variants.length > 0))}
               <button
                 class="tile__color-picker-trigger absolute left-1 top-1 p-2 shadow-md rounded-md cursor-pointer
                   bg-white dark:bg-neutral-700 hover:bg-neutral-100 hover:dark:bg-neutral-600"
                 onclick={(e) => {
                   e.stopPropagation();
-                  toggleColorPicker(accessory.id, e.currentTarget);
+                  toggleCustomization(accessory.id, e.currentTarget);
                 }}
-                title="Change Colors"
-                aria-label="Change Colors"
+                title="Change Customization"
+                aria-label="Change Customization"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -253,12 +257,8 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="lucide lucide-paint-bucket-icon lucide-paint-bucket"
-                  ><path d="M11 7 6 2" /><path d="M18.992 12H2.041" /><path
-                    d="M21.145 18.38A3.34 3.34 0 0 1 20 16.5a3.3 3.3 0 0 1-1.145 1.88c-.575.46-.855 1.02-.855 1.595A2 2 0 0 0 20 22a2 2 0 0 0 2-2.025c0-.58-.285-1.13-.855-1.595"
-                  /><path
-                    d="m8.5 4.5 2.148-2.148a1.205 1.205 0 0 1 1.704 0l7.296 7.296a1.205 1.205 0 0 1 0 1.704l-7.592 7.592a3.615 3.615 0 0 1-5.112 0l-3.888-3.888a3.615 3.615 0 0 1 0-5.112L5.67 7.33"
-                  /></svg
+                  class="lucide lucide-settings-icon lucide-settings"
+                  ><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg
                 >
                 <!-- Touch target -->
                 <div class="not-pointer-coarse:hidden absolute -inset-1"></div>
@@ -271,16 +271,17 @@
   </div>
 
   {#if activeAccessory && anchorElement}
-    <ColorPicker
-      supportsPrimary={activeAccessory.supportsPrimaryColor}
-      supportsSecondary={activeAccessory.supportsSecondaryColor}
-      supportsTertiary={activeAccessory.supportsTertiaryColor}
+    <CustomizationPicker
+      accessory={activeAccessory}
       selectedPrimary={selections.value[selectedAccessoryCategory]?.primaryColor}
       selectedSecondary={selections.value[selectedAccessoryCategory]?.secondaryColor}
       selectedTertiary={selections.value[selectedAccessoryCategory]?.tertiaryColor}
+      selectedVariantSuffix={selections.value[selectedAccessoryCategory]?.variantIdSuffix}
       onColorSelect={(type, color) =>
         onColorChange(selectedAccessoryCategory, type, color)}
-      onClose={() => (showColorPickerId = null)}
+      onVariantSelect={(suffix) =>
+        onVariantChange(selectedAccessoryCategory, suffix)}
+      onClose={() => (showCustomizationId = null)}
       {anchorElement}
     />
   {/if}
