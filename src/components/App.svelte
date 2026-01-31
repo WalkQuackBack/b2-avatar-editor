@@ -63,7 +63,9 @@
   />
 </aside>
 
-<main class="p-2 md:p-4">
-  <span>TODO: add proper preview</span>
+<main class="p-2 md:p-4 min-w-0 grow flex flex-col gap-2">
+  <div class="renderer-container flex grow p-2 bg-white dark:bg-neutral-900 rounded-3xl">
+    TODO
+  </div>
   <OutputBox />
 </main>
