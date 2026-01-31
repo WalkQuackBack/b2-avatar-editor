@@ -174,7 +174,7 @@
     aria-label="Accessory categories"
     onkeydown={handleTabKeyDown}
     tabindex="-1"
-    class="category-grid p-2 lg:p-4 rounded-t-3xl lg:rounded-none flex flex-nowrap shrink-0 overflow-x-auto bg-neutral-200 dark:bg-neutral-800 scrollbar-hide"
+    class="category-grid p-2 md:p-4 rounded-t-3xl md:rounded-none flex flex-nowrap shrink-0 overflow-x-auto bg-neutral-200 dark:bg-neutral-800 scrollbar-hide"
     style:mask-image="linear-gradient(to right, {showLeftMask
       ? 'rgb(0 0 0 / 0.2)'
       : 'black'}, black 40px, black calc(100% - 40px), {showRightMask
@@ -209,7 +209,7 @@
         aria-labelledby={category.id + "-tab"}
         hidden={selectedAccessoryCategory !== category.id}
         onkeydown={(e) => handleGridKeyDown(e, category.id)}
-        class="accessory-grid p-1 lg:p-4 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(6.25rem,1fr))]"
+        class="accessory-grid p-1 md:p-4 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] md:grid-cols-[repeat(auto-fill,minmax(6.25rem,1fr))]"
         tabindex="-1"
       >
         <Tile

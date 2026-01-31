@@ -52,7 +52,7 @@
   }
 </script>
 
-<aside class="h-1/2 lg:max-w-1/2 lg:h-full flex flex-col shrink-0">
+<aside class="h-1/2 md:max-w-1/2 md:h-full flex flex-col shrink-0">
   <AccessoryPicker
     accessoryCategories={Categories}
     {selectedAccessoryCategory}
@@ -63,7 +63,7 @@
   />
 </aside>
 
-<main class="p-2 lg:p-4">
+<main class="p-2 md:p-4">
   <span>TODO: add proper preview</span>
   <OutputBox />
 </main>
