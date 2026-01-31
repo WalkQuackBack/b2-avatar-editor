@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from "svelte/elements";
-  import { resolvePath } from "../utilities/resolvePath";
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -23,6 +22,12 @@
     children,
     ...rest
   }: Props = $props();
+
+  const resolvedImage = $derived(
+    image 
+      ? `${import.meta.env.BASE_URL}/${image}` 
+      : `${import.meta.env.BASE_URL}/assets/AssetError.svg`
+  );
 
   function onClick(event: MouseEvent) {
     if ((event.target as HTMLElement).closest(".tile__color-picker-trigger")) {
@@ -74,7 +79,7 @@
       : ''}"
   >
     <img
-      src={image}
+      src={resolvedImage}
       alt=""
       role="presentation"
       width="100"
